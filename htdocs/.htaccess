@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+	Options -MultiViews
+	RewriteEngine On
+
+#	RewriteRule css/styles.css /css/get.php [L]
+#    RewriteRule js/base.js /js/get.php [L]
+
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^ /index.php?{QUERY_STRING} [L]
+
+</IfModule>
