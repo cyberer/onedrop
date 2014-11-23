@@ -10,6 +10,12 @@ class App {
     private $url;
     private $data = array();
     private $template = 'index';
+    private $delete = array(
+        1 => 'weeks',
+        2 => 'days',
+        3 => 'weeks',
+        4 => 'months',
+    );
 
     function __construct($url) {
         $this->url = trim($url, '/');
@@ -48,13 +54,54 @@ class App {
         $this->template = 'index';
     }
 
-    private function upload() {
+    private function error() {
         $this->data = array(
-            'id' => $this->generateID(),
-            'title' => 'Hello'
+            'title' => 'Ooopsi'
+        );
+        $this->template = 'error';
+    }
+
+    private function upload() {
+        if (!$_POST['form']['url'] && !$_FILES['form']['name']) {
+            $this->error();
+        }
+        $url = $_POST['form']['url'];
+        $file = new File($_FILES['form']);
+        $file->createFolder($url);
+        $file->upload();
+        $path = $file->getFilePath();
+
+        $delete = intval($_POST['form']['deleteAfter']);
+
+        $db = new Db();
+        $db->save(array(
+                'code' => $url,
+                'file' => $path,
+                'date' => strtotime("+1 " . $this->delete[$delete]),
+                'now' => ($delete == 1 ? 1 : 0),
+            ));
+
+        $this->data = array(
+            'file' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $url,
+            'title' => 'your Link'
 
         );
         $this->template = 'upload';
+    }
+
+    private function download() {
+        $db = new Db();
+        $result = $db->read($this->url);
+
+        if (empty($result)) {
+            $this->error();
+            return;
+        }
+
+        $file = str_replace(DOC_DIR, '', $result['file']);
+
+        header("Location: " . $file);
+        die;
     }
 
 

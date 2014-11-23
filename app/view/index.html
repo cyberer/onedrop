@@ -13,8 +13,9 @@
 
 <div id="stage" class="row">
 
-<tal:block tal:condition="not: php: template EQ 'upload'" metal:use-macro="index"/>
+<tal:block tal:condition="php: template EQ 'index'" metal:use-macro="index"/>
 <tal:block tal:condition="php: template EQ 'upload'" metal:use-macro="upload"/>
+<tal:block tal:condition="php: template EQ 'error'" metal:use-macro="error"/>
 
 
 </div>
@@ -30,7 +31,7 @@
     <form method="post" action="/upload" id="my-awesome-dropzone" enctype="multipart/form-data">
         <div class="col-md-8">
             <div id="dropzone">
-                <input type="file" name="file" multiple="multiple" id="file" />
+                <input type="file" name="form[]" multiple="multiple" id="file" />
             </div>
         </div>
         <div class="col-md-4">
@@ -38,9 +39,9 @@
                 <label for="deleteAfter">Delete uploaded file after</label>
                 <select name="form[deleteAfter]" class="form-control" id="deleteAfter">
                     <option value="1">1st Download</option>
-                    <option value="1">1 Day</option>
-                    <option value="1">1 Week</option>
-                    <option value="1">1 Month</option>
+                    <option value="2">1 Day</option>
+                    <option value="3">1 Week</option>
+                    <option value="4">1 Month</option>
                 </select>
             </div>
             <div class="form-group">
@@ -67,7 +68,22 @@
 </div>
 
 <div metal:define-macro="upload">
-    LINK
+
+    <div class="form-group">
+        <label for="url">URL of your file</label>
+        <input type="text"
+               name="form[url]"
+               id="getURL"
+               class="form-control"
+               placeholder="URL der Datei"
+               tal:attributes="value data/file"
+                />
+
+    </div>
+</div>
+
+<div metal:define-macro="error">
+    ERROR
 </div>
 
 

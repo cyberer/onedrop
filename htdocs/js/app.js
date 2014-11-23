@@ -15,4 +15,8 @@
         $(this).parents("form").submit();
     });
 
+    $("#getURL").on("click", function(){
+        this.select();
+    });
+
 })(jQuery);
