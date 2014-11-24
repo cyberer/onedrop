@@ -56,3 +56,9 @@ input#file {
     font-size: 1000%;
     color: #ccc;
 }
+h2 {
+    position: absolute;
+    top: -25px;
+    text-align: center;
+    width: 100%;
+}

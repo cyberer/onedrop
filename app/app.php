@@ -65,7 +65,14 @@ class App {
         if (!$_POST['form']['url'] && !$_FILES['form']['name']) {
             $this->error();
         }
+        $db = new Db();
         $url = $_POST['form']['url'];
+        $url = str_replace('/', '', $url);
+        $result = $db->read($url);
+        if (!empty($result)) {
+            $url = $this->generateID();
+        }
+
         $file = new File($_FILES['form']);
         $file->createFolder($url);
         $file->upload();
