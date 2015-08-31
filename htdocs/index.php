@@ -17,7 +17,7 @@ require_once "{$appDir}file.php";
 require_once "{$appDir}db.php";
 require_once "{$appDir}app.php";
 
-$url = $_SERVER['REDIRECT_URL'] ? $_SERVER['REDIRECT_URL'] : '/';
+$url = empty($_GET) ? '/' : key($_GET);
 
 $app = new App($url);
 

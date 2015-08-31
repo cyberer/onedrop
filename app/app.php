@@ -36,7 +36,7 @@ class App {
         }
     }
 
-    private function getUrl() {
+    public function getUrl() {
         return $this->url;
     }
 
