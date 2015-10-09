@@ -15,7 +15,10 @@ class File {
     private $output = '';
     private $count = 0;
 
-    function __construct($files) {
+    function __construct($files = array()) {
+        if (empty($files)) {
+            return null;
+        }
         $this->names = $files['name'];
         $this->tmp = $files['tmp_name'];
     }
@@ -27,6 +30,20 @@ class File {
             throw new Exception("Could not create Upload-Folder in " . $this->uploadDir);
         }
         $this->uploadDir = $dir;
+    }
+
+    function removeFolder($id) {
+        $dir = $this->uploadDir . $id;
+
+        if (!is_dir($dir)) {
+            return null;
+        }
+
+        foreach (glob($dir . '/*') as $file) {
+            @unlink($file);
+        }
+
+        @rmdir($dir);
     }
 
 

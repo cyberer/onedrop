@@ -17,7 +17,7 @@ class Db {
             // status 0 => delete
             // status 1 => offline
             // status 2 => online
-            $this->db->exec('CREATE TABLE files (id INTEGER PRIMARY KEY AUTOINCREMENT, code VARCHAR, file VARCHAR, status INTEGER, delete_time DATE, delete_now INTEGER)');
+            $this->db->exec('CREATE TABLE files (id INTEGER PRIMARY KEY AUTOINCREMENT, code VARCHAR, file VARCHAR, status INTEGER, delete_time INTEGER, delete_now INTEGER)');
         } else {
             $this->db = new SQLite3($this->dbFile);
         }
@@ -30,7 +30,29 @@ class Db {
         $now = $data['now'];
 //        echo("INSERT INTO files (code, file, status, delete_time, delete_now) VALUES ('{$code}', {$file}, '2', '{$date}', '{$now}')");
         $this->db->exec("INSERT INTO files (code, file, status, delete_time, delete_now) VALUES ('{$code}', '{$file}', '2', '{$date}', '{$now}')");
-        $this->db->close();
+    }
+
+    function getDeleteCandidates($date) {
+        $results = $this->db->query("SELECT * FROM files WHERE delete_time < '{$date}' OR status = 0");
+        $rows = array();
+        while($result = $results->fetchArray(SQLITE3_ASSOC)) {
+            $rows[] = $result;
+        }
+        return $rows;
+    }
+
+    function cleanOldEntries($date) {
+        $this->db->exec("DELETE FROM files WHERE delete_time < '{$date}' OR status = 0");
+    }
+
+    function update($id, array $data) {
+        $q = array();
+        foreach ($data as $key => $value) {
+            $v = $this->db->escapeString($value);
+            $q[] = "{$key} = '{$v}'";
+        }
+        $query = implode(", ", $q);
+        $this->db->exec("UPDATE files SET {$query} WHERE id = {$id}");
     }
 
     function read($code) {
@@ -40,7 +62,11 @@ class Db {
     }
 
     function deleteRow($id) {
-        $results = $this->db->query("DELETE FROM files WHERE id = {$id}");
+        $results = $this->db->exec("DELETE FROM files WHERE id = {$id}");
+    }
+
+    function __destruct() {
+        $this->db->close();
     }
 
 

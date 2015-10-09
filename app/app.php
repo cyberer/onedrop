@@ -52,6 +52,7 @@ class App {
 
         );
         $this->template = 'index';
+        $this->clean();
     }
 
     private function error() {
@@ -96,6 +97,17 @@ class App {
         $this->template = 'upload';
     }
 
+    private function clean() {
+        $db = new Db();
+        $file = new File();
+        $date = time();
+        $deletions = $db->getDeleteCandidates($date);
+        foreach($deletions as $del) {
+            $file->removeFolder($del['code']);
+            $db->deleteRow($del['id']);
+        }
+    }
+
     private function download() {
         $db = new Db();
         $result = $db->read($this->url);
@@ -103,6 +115,10 @@ class App {
         if (empty($result)) {
             $this->error();
             return;
+        }
+
+        if (1 == $result['delete_now']) {
+            $db->update($result['id'], array('status' => 0));
         }
 
         $file = str_replace(DOC_DIR, '', $result['file']);
@@ -116,7 +132,7 @@ class App {
         $template = new PHPTAL('index.html');
         $template->setOutputMode(PHPTAL::HTML5);
         $template->setTemplateRepository(__DIR__ . "/view");
-        $template->title = "index";
+        $template->title = "simple drop & share";
         $template->upload = false;
         $template->template = $this->template;
         $template->data = $this->data;
